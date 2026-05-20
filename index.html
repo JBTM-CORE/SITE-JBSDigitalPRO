@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JBS DigitalPRO - Contato</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f7f7f8; color: #1f2937; }
+    .container { max-width: 860px; margin: 3rem auto; padding: 2rem; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+    h1 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .full { grid-column: 1 / -1; }
+    label { display: block; font-weight: 700; margin-bottom: .35rem; }
+    input, select, textarea { width: 100%; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 8px; padding: .75rem; font-size: 1rem; }
+    textarea { min-height: 130px; resize: vertical; }
+    button { border: 0; background: #1d4ed8; color: #fff; font-weight: 700; border-radius: 8px; padding: .85rem 1.1rem; cursor: pointer; }
+    button[disabled] { opacity: .65; cursor: wait; }
+    .msg { margin-top: 1rem; font-weight: 600; }
+    .ok { color: #166534; }
+    .err { color: #991b1b; }
+    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="container" id="contato">
+    <h1>Fale com a JBS DigitalPRO</h1>
+
+    <form id="contactForm" novalidate>
+      <div class="grid">
+        <div>
+          <label for="name">Nome</label>
+          <input id="name" name="name" type="text" autocomplete="name" required minlength="2" />
+        </div>
+
+        <div>
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" autocomplete="email" required />
+        </div>
+
+        <div>
+          <label for="phone">Telefone / WhatsApp</label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" required minlength="8" />
+        </div>
+
+        <div>
+          <label for="company">Empresa</label>
+          <input id="company" name="company" type="text" autocomplete="organization" />
+        </div>
+
+        <div class="full">
+          <label for="service">Serviço de interesse</label>
+          <select id="service" name="service" required>
+            <option value="">Selecione...</option>
+            <option value="Tráfego Pago">Tráfego Pago</option>
+            <option value="SEO">SEO</option>
+            <option value="Desenvolvimento Web">Desenvolvimento Web</option>
+            <option value="Automação de Marketing">Automação de Marketing</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="full">
+          <label for="message">Mensagem</label>
+          <textarea id="message" name="message" required minlength="10"></textarea>
+        </div>
+
+        <div class="hp" aria-hidden="true">
+          <label for="company_website">Deixe vazio</label>
+          <input id="company_website" name="company_website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="full">
+          <button type="submit" id="submitBtn">Enviar</button>
+          <p class="msg" id="feedback" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById('contactForm');
+    const btn = document.getElementById('submitBtn');
+    const feedback = document.getElementById('feedback');
+    const formStart = Date.now();
+
+    const ENDPOINT = '/api/create_lead.php';
+
+    const setFeedback = (message, ok = false) => {
+      feedback.textContent = message;
+      feedback.className = `msg ${ok ? 'ok' : 'err'}`;
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setFeedback('');
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const elapsedMs = Date.now() - formStart;
+      if (elapsedMs < 2500) {
+        setFeedback('Aguarde um instante e tente novamente.');
+        return;
+      }
+
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (data.company_website) {
+        setFeedback('Não foi possível enviar sua solicitação.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: data.name.trim(),
+            email: data.email.trim(),
+            phone: data.phone.trim(),
+            company: data.company.trim(),
+            service: data.service,
+            message: data.message.trim(),
+            source: 'Site JBS DigitalPRO',
+            elapsed_ms: elapsedMs,
+            hp: data.company_website
+          })
+        });
+
+        const payload = await res.json();
+
+        if (!res.ok || !payload.ok) {
+          throw new Error(payload.error || 'Falha ao criar lead no CRM.');
+        }
+
+        form.reset();
+        setFeedback('Mensagem enviada com sucesso! Em breve nossa equipe entrará em contato.', true);
+      } catch (err) {
+        setFeedback(err.message || 'Erro ao enviar. Tente novamente em alguns minutos.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar';
+      }
+    });
+  </script>
+</body>
+</html>
