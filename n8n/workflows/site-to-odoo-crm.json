@@ -1,0 +1,664 @@
+{
+  "name": "Site JBS DigitalPRO -> Odoo CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "site/jbsdigitalpro/leads",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Webhook Leads",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -980,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\n\nconst required = ['nome', 'whatsapp', 'email', 'servico'];\nconst missing = required.filter((field) => {\n  const value = body[field];\n  return value === undefined || value === null || String(value).trim() === '';\n});\n\nif (missing.length) {\n  return [{\n    valid: false,\n    statusCode: 400,\n    message: `Campos obrigatórios ausentes: ${missing.join(', ')}`,\n    data: body\n  }];\n}\n\nfunction normalizePhone(input) {\n  const digits = String(input).replace(/\\D/g, '');\n  if (!digits) return '';\n\n  let normalized = digits;\n  if (normalized.startsWith('55')) {\n    normalized = `+${normalized}`;\n  } else if (normalized.length >= 10) {\n    normalized = `+55${normalized}`;\n  } else {\n    normalized = `+${normalized}`;\n  }\n\n  return normalized;\n}\n\nfunction normalizeEmail(input) {\n  return String(input || '').trim().toLowerCase();\n}\n\nfunction normalizeText(input) {\n  return String(input || '')\n    .trim()\n    .replace(/\\s+/g, ' ');\n}\n\nconst nome = normalizeText(body.nome);\nconst whatsapp = normalizePhone(body.whatsapp);\nconst email = normalizeEmail(body.email);\nconst servico = normalizeText(body.servico).toLowerCase();\nconst mensagem = normalizeText(body.mensagem || body.message || '');\n\nconst serviceToTag = {\n  webdesign: 'webdesign',\n  marketing: 'marketing',\n  ia: 'ia',\n  chatbot: 'chatbot',\n  odoo: 'odoo',\n  n8n: 'n8n',\n};\n\nconst normalizedService = Object.keys(serviceToTag).find((key) => servico.includes(key)) || servico;\nconst tags = [];\nif (serviceToTag[normalizedService]) tags.push(serviceToTag[normalizedService]);\n\nreturn [{\n  valid: true,\n  statusCode: 200,\n  source: 'Site JBS DigitalPRO',\n  nome,\n  whatsapp,\n  email,\n  servico: normalizedService,\n  mensagem,\n  tags,\n  raw: body\n}];"
+      },
+      "id": "2",
+      "name": "Validar e Normalizar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -740,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.valid }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Lead Válido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, message: $json.message || 'Payload inválido' } }}",
+        "options": {
+          "responseCode": "={{ $json.statusCode || 400 }}"
+        }
+      },
+      "id": "4",
+      "name": "Resposta Erro",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.ODOO_BASE_URL }}/jsonrpc",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { service: 'common', method: 'login', args: [$env.ODOO_DB, $env.ODOO_USERNAME, $env.ODOO_PASSWORD] }, id: Date.now() }) }}",
+        "options": {}
+      },
+      "id": "5",
+      "name": "Odoo Login",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -280,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const uid = $json.result;\nif (!uid) throw new Error('Falha ao autenticar no Odoo.');\n\nconst lead = $items('Validar e Normalizar', 0, 0).json;\n\nreturn [{\n  uid,\n  source: lead.source,\n  nome: lead.nome,\n  whatsapp: lead.whatsapp,\n  email: lead.email,\n  servico: lead.servico,\n  mensagem: lead.mensagem,\n  tags: lead.tags,\n}];"
+      },
+      "id": "6",
+      "name": "Preparar Contexto Odoo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.ODOO_BASE_URL }}/jsonrpc",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { service: 'object', method: 'execute_kw', args: [ $env.ODOO_DB, $json.uid, $env.ODOO_PASSWORD, 'res.partner', 'search_read', [[['email', '=', $json.email]]], { fields: ['id', 'name', 'email', 'mobile'], limit: 1 } ] }, id: Date.now() }) }}",
+        "options": {}
+      },
+      "id": "7",
+      "name": "Buscar Contato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        200,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $items('Preparar Contexto Odoo', 0, 0).json;\nconst partners = $json.result || [];\nconst existing = partners[0];\n\nreturn [{\n  ...ctx,\n  partner_id: existing?.id || null\n}];"
+      },
+      "id": "8",
+      "name": "Resolver Contato",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.partner_id || 0 }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "id": "9",
+      "name": "Contato Existe?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        640,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.ODOO_BASE_URL }}/jsonrpc",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { service: 'object', method: 'execute_kw', args: [ $env.ODOO_DB, $json.uid, $env.ODOO_PASSWORD, 'res.partner', 'write', [[$json.partner_id], { name: $json.nome, mobile: $json.whatsapp, email: $json.email }] ] }, id: Date.now() }) }}",
+        "options": {}
+      },
+      "id": "10",
+      "name": "Atualizar Contato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [$items('Resolver Contato', 0, 0).json];"
+      },
+      "id": "11",
+      "name": "Manter Contexto (Update)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.ODOO_BASE_URL }}/jsonrpc",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { service: 'object', method: 'execute_kw', args: [ $env.ODOO_DB, $json.uid, $env.ODOO_PASSWORD, 'res.partner', 'create', [{ name: $json.nome, mobile: $json.whatsapp, email: $json.email }] ] }, id: Date.now() }) }}",
+        "options": {}
+      },
+      "id": "12",
+      "name": "Criar Contato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $items('Resolver Contato', 0, 0).json;\nconst partnerId = $json.result;\n\nreturn [{\n  ...ctx,\n  partner_id: partnerId\n}];"
+      },
+      "id": "13",
+      "name": "Salvar PartnerID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "wait"
+      },
+      "id": "14",
+      "name": "Merge Contato",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1300,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.ODOO_BASE_URL }}/jsonrpc",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { service: 'object', method: 'execute_kw', args: [ $env.ODOO_DB, $json.uid, $env.ODOO_PASSWORD, 'crm.lead', 'create', [{ name: `Lead Site - ${$json.nome}`, partner_id: $json.partner_id, email_from: $json.email, phone: $json.whatsapp, contact_name: $json.nome, description: $json.mensagem, source_id: false, x_origem_texto: $json.source }] ] }, id: Date.now() }) }}",
+        "options": {}
+      },
+      "id": "15",
+      "name": "Criar Oportunidade",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $items('Merge Contato', 0, 0).json;\nconst leadId = $json.result;\n\nreturn [{\n  ...ctx,\n  lead_id: leadId\n}];"
+      },
+      "id": "16",
+      "name": "Anexar LeadID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.ODOO_BASE_URL }}/jsonrpc",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { service: 'object', method: 'execute_kw', args: [ $env.ODOO_DB, $json.uid, $env.ODOO_PASSWORD, 'crm.tag', 'search_read', [[['name', 'in', $json.tags]]], { fields: ['id', 'name'] } ] }, id: Date.now() }) }}",
+        "options": {}
+      },
+      "id": "17",
+      "name": "Buscar Tags",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1960,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $items('Anexar LeadID', 0, 0).json;\nconst tags = ($json.result || []).map((t) => t.id);\n\nreturn [{\n  ...ctx,\n  tag_ids: tags\n}];"
+      },
+      "id": "18",
+      "name": "Preparar Tags",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2180,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.tag_ids.length }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "id": "19",
+      "name": "Tem Tags?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.ODOO_BASE_URL }}/jsonrpc",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ jsonrpc: '2.0', method: 'call', params: { service: 'object', method: 'execute_kw', args: [ $env.ODOO_DB, $json.uid, $env.ODOO_PASSWORD, 'crm.lead', 'write', [[$json.lead_id], { tag_ids: [[6, 0, $json.tag_ids]] }] ] }, id: Date.now() }) }}",
+        "options": {}
+      },
+      "id": "20",
+      "name": "Aplicar Tags no Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2620,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [$items('Preparar Tags', 0, 0).json];"
+      },
+      "id": "21",
+      "name": "Seguir Sem Tags",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2620,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "wait"
+      },
+      "id": "22",
+      "name": "Merge Tags",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2840,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.INTERNAL_NOTIFY_WEBHOOK }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { text: `🟢 Novo lead do site: ${$json.nome} | ${$json.servico} | ${$json.whatsapp} | ${$json.email}` } }}",
+        "options": {}
+      },
+      "id": "23",
+      "name": "Notificação Interna",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3060,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, message: 'Lead recebido com sucesso', lead_id: $json.lead_id } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "24",
+      "name": "Resposta Sucesso",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3280,
+        20
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Leads": {
+      "main": [
+        [
+          {
+            "node": "Validar e Normalizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar e Normalizar": {
+      "main": [
+        [
+          {
+            "node": "Lead Válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Válido?": {
+      "main": [
+        [
+          {
+            "node": "Odoo Login",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resposta Erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Odoo Login": {
+      "main": [
+        [
+          {
+            "node": "Preparar Contexto Odoo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Contexto Odoo": {
+      "main": [
+        [
+          {
+            "node": "Buscar Contato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Contato": {
+      "main": [
+        [
+          {
+            "node": "Resolver Contato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolver Contato": {
+      "main": [
+        [
+          {
+            "node": "Contato Existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contato Existe?": {
+      "main": [
+        [
+          {
+            "node": "Atualizar Contato",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Criar Contato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizar Contato": {
+      "main": [
+        [
+          {
+            "node": "Manter Contexto (Update)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Contato": {
+      "main": [
+        [
+          {
+            "node": "Salvar PartnerID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manter Contexto (Update)": {
+      "main": [
+        [
+          {
+            "node": "Merge Contato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salvar PartnerID": {
+      "main": [
+        [
+          {
+            "node": "Merge Contato",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Contato": {
+      "main": [
+        [
+          {
+            "node": "Criar Oportunidade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Oportunidade": {
+      "main": [
+        [
+          {
+            "node": "Anexar LeadID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anexar LeadID": {
+      "main": [
+        [
+          {
+            "node": "Buscar Tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Tags": {
+      "main": [
+        [
+          {
+            "node": "Preparar Tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Tags": {
+      "main": [
+        [
+          {
+            "node": "Tem Tags?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tem Tags?": {
+      "main": [
+        [
+          {
+            "node": "Aplicar Tags no Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Seguir Sem Tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aplicar Tags no Lead": {
+      "main": [
+        [
+          {
+            "node": "Merge Tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seguir Sem Tags": {
+      "main": [
+        [
+          {
+            "node": "Merge Tags",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Tags": {
+      "main": [
+        [
+          {
+            "node": "Notificação Interna",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notificação Interna": {
+      "main": [
+        [
+          {
+            "node": "Resposta Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "versionId": "1"
+}
