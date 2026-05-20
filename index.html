@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JBS DigitalPRO | Soluções Digitais Premium</title>
+  <meta name="description" content="JBS DigitalPRO: vitrine de serviços premium em Webdesign, Marketing Digital, IA, Chatbots, Automações, Odoo e n8n." />
+  <style>
+    :root {
+      --bg: #070b14;
+      --bg-soft: #111827;
+      --panel: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-2: #22d3ee;
+      --line: #1f2937;
+      --ok: #34d399;
+      --radius: 16px;
+      --shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+      --maxw: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% -5%, rgba(34, 211, 238, 0.1), transparent 35%),
+        radial-gradient(circle at 90% -10%, rgba(59, 130, 246, 0.12), transparent 40%),
+        var(--bg);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(92%, var(--maxw));
+      margin: 0 auto;
+    }
+
+    .section { padding: 72px 0; }
+
+    .tag {
+      display: inline-flex;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent-2);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+      background: rgba(34, 211, 238, 0.05);
+    }
+
+    h1, h2, h3 { line-height: 1.2; margin: 0 0 16px; }
+
+    h1 { font-size: clamp(2rem, 4vw, 3.35rem); }
+    h2 { font-size: clamp(1.55rem, 3vw, 2.35rem); }
+    h3 { font-size: 1.2rem; }
+
+    p { margin: 0 0 12px; color: var(--muted); }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(7, 11, 20, 0.72);
+      border-bottom: 1px solid rgba(31, 41, 55, 0.7);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      gap: 16px;
+    }
+
+    .brand { font-weight: 800; letter-spacing: 0.03em; }
+    .brand small { color: var(--accent-2); font-weight: 600; }
+
+    .menu {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 0.94rem;
+      color: var(--muted);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #001018;
+    }
+
+    .btn-primary:hover { transform: translateY(-1px); }
+
+    .btn-ghost {
+      border-color: var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 28px;
+      align-items: center;
+      padding: 84px 0 60px;
+    }
+
+    .hero-panel {
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(15, 23, 42, 0.9));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .kpis {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .kpi {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .kpi strong {
+      display: block;
+      color: var(--text);
+      font-size: 1.2rem;
+      margin-bottom: 4px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.95));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .card .icon {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      display: inline-block;
+      color: var(--accent-2);
+    }
+
+    .benefits {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .benefit {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.65);
+      padding: 16px;
+    }
+
+    .process-step { position: relative; }
+    .process-step::before {
+      content: "";
+      position: absolute;
+      inset: auto -8px 0 auto;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, var(--accent), var(--accent-2));
+      opacity: 0.25;
+    }
+
+    .case {
+      border-left: 3px solid var(--ok);
+      background: rgba(15, 23, 42, 0.82);
+    }
+
+    .cta {
+      text-align: center;
+      background: linear-gradient(140deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.14));
+      border: 1px solid #1e3a8a;
+      border-radius: var(--radius);
+      padding: 34px 24px;
+    }
+
+    footer {
+      padding: 28px 0 40px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      margin-top: 50px;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .grid-3, .grid-4, .benefits { grid-template-columns: 1fr 1fr; }
+      .kpis { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 680px) {
+      .menu { display: none; }
+      .hero, .grid-3, .grid-4, .benefits { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">JBS DigitalPRO <small>// Premium Tech Agency</small></div>
+      <nav class="menu">
+        <a href="#servicos">Serviços</a>
+        <a href="#beneficios">Benefícios</a>
+        <a href="#processo">Processo</a>
+        <a href="#cases">Cases</a>
+      </nav>
+      <a class="btn btn-primary" href="#contato">Quero vender mais</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="container hero" id="inicio">
+      <div>
+        <span class="tag">Vitrine Comercial JBS DigitalPRO</span>
+        <h1>Projetos digitais de alto impacto para atrair, converter e escalar.</h1>
+        <p>
+          Evoluímos marcas com estratégia, design e tecnologia. Esta estrutura foi desenhada para atuar como
+          modelo de venda: visão premium, proposta de valor clara e blocos reutilizáveis para expansão futura em WordPress multipáginas.
+        </p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;">
+          <a class="btn btn-primary" href="#servicos">Conhecer soluções</a>
+          <a class="btn btn-ghost" href="#cases">Ver cases</a>
+        </div>
+      </div>
+
+      <aside class="hero-panel">
+        <h3>Painel de Performance Comercial</h3>
+        <p>Estrutura orientada a resultados para posicionar a JBS DigitalPRO como parceira estratégica.</p>
+        <div class="kpis">
+          <div class="kpi"><strong>+Leads</strong><span>Captação qualificada com funis digitais.</span></div>
+          <div class="kpi"><strong>+Eficiência</strong><span>Automação comercial e operacional.</span></div>
+          <div class="kpi"><strong>+Conversão</strong><span>Atendimento inteligente em escala.</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="servicos">
+      <div class="container">
+        <span class="tag">Serviços Estratégicos</span>
+        <h2>Portfólio comercial com foco em crescimento</h2>
+        <p>Cards de serviço reutilizáveis para página inicial e futuras páginas internas no WordPress.</p>
+
+        <div class="grid grid-4" style="margin-top:24px;">
+          <article class="card"><span class="icon">🌐</span><h3>Webdesign</h3><p>Sites premium com UX orientada à conversão, velocidade e autoridade de marca.</p></article>
+          <article class="card"><span class="icon">📈</span><h3>Marketing Digital</h3><p>Estratégias de tráfego, conteúdo e performance para geração de demanda previsível.</p></article>
+          <article class="card"><span class="icon">🤖</span><h3>Inteligência Artificial</h3><p>Aplicações de IA para ganho de produtividade, personalização e tomada de decisão.</p></article>
+          <article class="card"><span class="icon">💬</span><h3>Chatbots</h3><p>Assistentes digitais que qualificam contatos e mantêm atendimento ativo 24/7.</p></article>
+          <article class="card"><span class="icon">⚙️</span><h3>Automações</h3><p>Conexão de sistemas, redução de tarefas manuais e escala operacional com controle.</p></article>
+          <article class="card"><span class="icon">🏢</span><h3>Odoo</h3><p>Implantação e personalização de ERP para processos comerciais e administrativos.</p></article>
+          <article class="card"><span class="icon">🔗</span><h3>n8n</h3><p>Fluxos automatizados e orquestração low-code para integrar toda a operação.</p></article>
+          <article class="card"><span class="icon">🧩</span><h3>Consultoria Integrada</h3><p>Diagnóstico, roadmap e acompanhamento para consolidar crescimento sustentável.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="beneficios">
+      <div class="container">
+        <span class="tag">Benefícios Diretos</span>
+        <h2>Clareza de valor para decisão rápida</h2>
+        <div class="benefits" style="margin-top:22px;">
+          <article class="benefit"><h3>Geração de leads</h3><p>Estratégias e ativos digitais para atrair oportunidades com intenção de compra.</p></article>
+          <article class="benefit"><h3>Automação comercial</h3><p>Processos inteligentes para reduzir tempo de resposta e aumentar produtividade.</p></article>
+          <article class="benefit"><h3>Presença digital premium</h3><p>Posicionamento moderno para reforçar autoridade e confiança no mercado.</p></article>
+          <article class="benefit"><h3>Atendimento inteligente</h3><p>Fluxos automatizados com IA e chatbots para suporte e conversão contínua.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="processo">
+      <div class="container">
+        <span class="tag">Método Reutilizável</span>
+        <h2>Cards de processo para proposta comercial</h2>
+        <div class="grid grid-3" style="margin-top:22px;">
+          <article class="card process-step"><h3>1. Diagnóstico</h3><p>Mapeamento de objetivos, canais, gargalos e oportunidades de crescimento.</p></article>
+          <article class="card process-step"><h3>2. Arquitetura</h3><p>Definição da estratégia digital, funis, automações e stack tecnológica ideal.</p></article>
+          <article class="card process-step"><h3>3. Implementação</h3><p>Entrega de site, campanhas, integrações e IA com acompanhamento de performance.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cases">
+      <div class="container">
+        <span class="tag">Seção de Cases</span>
+        <h2>Provas sociais para elevar confiança</h2>
+        <div class="grid grid-3" style="margin-top:22px;">
+          <article class="card case"><h3>Case 01 · Serviços B2B</h3><p>Reestruturação de presença digital com aumento de oportunidades comerciais.</p></article>
+          <article class="card case"><h3>Case 02 · E-commerce</h3><p>Automação de atendimento e recuperação de carrinho com ganhos recorrentes.</p></article>
+          <article class="card case"><h3>Case 03 · Operação Interna</h3><p>Integrações via n8n e Odoo para eliminar tarefas manuais e reduzir custos.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section" id="contato">
+      <div class="cta">
+        <span class="tag">CTA Comercial</span>
+        <h2>Pronto para transformar seu digital em máquina de vendas?</h2>
+        <p>Agende uma conversa estratégica e receba um plano de evolução sob medida.</p>
+        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:18px;">
+          <a class="btn btn-primary" href="#">Solicitar diagnóstico</a>
+          <a class="btn btn-ghost" href="#">Falar com especialista</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2026 JBS DigitalPRO. Layout preparado para evolução em tema WordPress multipáginas.</p>
+      <p>Nota: o logotipo oficial da marca pode ser incorporado assim que o arquivo for disponibilizado.</p>
+    </div>
+  </footer>
+</body>
+</html>
