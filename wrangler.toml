@@ -1,0 +1,7 @@
+name = "jbsdigitalpro-lead-gateway"
+main = "cloudflare-worker.js"
+compatibility_date = "2026-05-19"
+
+[vars]
+# Configure via `wrangler secret put`:
+# ODOO_URL, ODOO_DB, ODOO_LOGIN, ODOO_PASSWORD
