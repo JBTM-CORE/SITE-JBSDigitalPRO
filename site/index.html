@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Captação de Leads - JBS Digital PRO</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; background: #f7f7fb; color: #222; }
+      h1 { margin-bottom: 1.5rem; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+      .card { background: #fff; border-radius: 12px; padding: 1rem; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+      form { display: grid; gap: .6rem; }
+      label { font-size: .9rem; font-weight: 600; }
+      input, select, textarea, button { font: inherit; padding: .5rem; border: 1px solid #d2d2df; border-radius: 8px; }
+      textarea { min-height: 80px; }
+      button { background: #2f65ff; color: #fff; border: none; cursor: pointer; }
+      button:hover { filter: brightness(.95); }
+      .status { font-size: .85rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Fluxos de Captação</h1>
+    <div class="grid">
+      <section class="card">
+        <h2>Contato simples</h2>
+        <form data-form-type="contato" data-source="site">
+          <label>Nome <input name="name" required /></label>
+          <label>E-mail <input type="email" name="email" required /></label>
+          <label>Mensagem <textarea name="message" required></textarea></label>
+          <button type="submit">Enviar contato</button>
+          <div class="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Solicitar orçamento</h2>
+        <form data-form-type="orcamento" data-source="landing_page">
+          <label>Nome <input name="name" required /></label>
+          <label>WhatsApp <input name="phone" required /></label>
+          <label>Empresa <input name="company" /></label>
+          <label>Faixa de investimento
+            <select name="budget_range" required>
+              <option value="">Selecione</option>
+              <option>Até R$ 3.000</option>
+              <option>R$ 3.001 - R$ 10.000</option>
+              <option>R$ 10.001 - R$ 30.000</option>
+              <option>Acima de R$ 30.000</option>
+            </select>
+          </label>
+          <label>Prazo desejado
+            <select name="timeline" required>
+              <option value="">Selecione</option>
+              <option>Urgente (até 15 dias)</option>
+              <option>1 a 2 meses</option>
+              <option>3+ meses</option>
+            </select>
+          </label>
+          <label>Escopo do projeto <textarea name="project_scope" required></textarea></label>
+          <button type="submit">Pedir orçamento</button>
+          <div class="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Diagnóstico gratuito</h2>
+        <form data-form-type="diagnostico_gratuito" data-source="diagnostico_gratuito">
+          <label>Nome <input name="name" required /></label>
+          <label>E-mail corporativo <input type="email" name="email" required /></label>
+          <label>Site atual <input type="url" name="website_url" required /></label>
+          <label>Canal principal
+            <select name="main_channel" required>
+              <option value="">Selecione</option>
+              <option>Tráfego pago</option>
+              <option>SEO</option>
+              <option>Redes sociais</option>
+              <option>WhatsApp</option>
+            </select>
+          </label>
+          <label>Principal desafio <textarea name="main_pain" required></textarea></label>
+          <button type="submit">Quero diagnóstico</button>
+          <div class="status" aria-live="polite"></div>
+        </form>
+      </section>
+    </div>
+
+    <script>
+      // Modo A: webhooks distintos por formulário.
+      const WEBHOOKS_BY_TYPE = {
+        contato: "https://n8n.seu-dominio.com/webhook/lead-contato",
+        orcamento: "https://n8n.seu-dominio.com/webhook/lead-orcamento",
+        diagnostico_gratuito: "https://n8n.seu-dominio.com/webhook/lead-diagnostico"
+      };
+
+      // Modo B: webhook único + form_type.
+      const UNIFIED_WEBHOOK = "https://n8n.seu-dominio.com/webhook/lead-captacao";
+      const USE_UNIFIED_WEBHOOK = true;
+
+      async function sendLead(form) {
+        const formData = new FormData(form);
+        const payload = Object.fromEntries(formData.entries());
+        payload.form_type = form.dataset.formType;
+        payload.source = form.dataset.source;
+        payload.created_at = new Date().toISOString();
+
+        const endpoint = USE_UNIFIED_WEBHOOK
+          ? UNIFIED_WEBHOOK
+          : WEBHOOKS_BY_TYPE[payload.form_type];
+
+        const status = form.querySelector(".status");
+        status.textContent = "Enviando...";
+
+        try {
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            throw new Error(`Falha HTTP ${response.status}`);
+          }
+
+          status.textContent = "Lead enviado com sucesso.";
+          form.reset();
+        } catch (error) {
+          status.textContent = `Erro ao enviar: ${error.message}`;
+        }
+      }
+
+      document.querySelectorAll("form[data-form-type]").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          sendLead(form);
+        });
+      });
+    </script>
+  </body>
+</html>
