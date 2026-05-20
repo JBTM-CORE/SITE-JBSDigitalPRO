@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JBS DigitalPRO - Contato</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    form { max-width: 640px; display: grid; gap: 0.8rem; }
+    label { font-weight: 600; }
+    input, select, textarea, button { padding: 0.7rem; font-size: 1rem; }
+    .status { margin-top: 0.8rem; font-size: 0.95rem; }
+    .ok { color: #0a7f32; }
+    .erro { color: #b30000; }
+  </style>
+</head>
+<body>
+  <h1>Fale com a JBS DigitalPRO</h1>
+
+  <form id="contato-form" novalidate>
+    <label for="nome">Nome</label>
+    <input id="nome" name="nome" type="text" required minlength="2" />
+
+    <label for="email">E-mail</label>
+    <input id="email" name="email" type="email" required />
+
+    <label for="whatsapp">WhatsApp</label>
+    <input id="whatsapp" name="whatsapp" type="tel" required />
+
+    <label for="empresa">Empresa</label>
+    <input id="empresa" name="empresa" type="text" required />
+
+    <label for="servico">Serviço de interesse</label>
+    <select id="servico" name="servico" required>
+      <option value="">Selecione...</option>
+      <option value="implantacao_odoo">Implantação Odoo</option>
+      <option value="integracao_n8n">Integração n8n</option>
+      <option value="consultoria_erp">Consultoria ERP</option>
+    </select>
+
+    <label for="mensagem">Mensagem</label>
+    <textarea id="mensagem" name="mensagem" rows="5" required minlength="10"></textarea>
+
+    <button type="submit">Enviar</button>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </form>
+
+  <script>
+    // Substitua pela URL pública do Webhook do n8n (produção)
+    const N8N_WEBHOOK_URL = "https://SEU-N8N/webhook/jbs-digitalpro-contato";
+
+    const form = document.getElementById("contato-form");
+    const statusEl = document.getElementById("status");
+
+    function setStatus(texto, classe) {
+      statusEl.textContent = texto;
+      statusEl.className = `status ${classe}`;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setStatus("", "");
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const formData = new FormData(form);
+      const payload = {
+        nome: formData.get("nome")?.toString().trim(),
+        email: formData.get("email")?.toString().trim(),
+        whatsapp: formData.get("whatsapp")?.toString().trim(),
+        empresa: formData.get("empresa")?.toString().trim(),
+        servicoInteresse: formData.get("servico")?.toString().trim(),
+        mensagem: formData.get("mensagem")?.toString().trim(),
+        origem: "Site JBS DigitalPRO",
+        paginaAcessada: window.location.href,
+        userAgent: navigator.userAgent,
+        enviadoEm: new Date().toISOString()
+      };
+
+      try {
+        const response = await fetch(N8N_WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || result.sucesso === false) {
+          const mensagemErro = result.mensagem || "Não foi possível enviar sua solicitação agora.";
+          setStatus(mensagemErro, "erro");
+          return;
+        }
+
+        setStatus(result.mensagem || "Mensagem enviada com sucesso!", "ok");
+        form.reset();
+      } catch {
+        setStatus("Erro de conexão ao enviar. Tente novamente em instantes.", "erro");
+      }
+    });
+  </script>
+</body>
+</html>
