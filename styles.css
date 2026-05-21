@@ -44,26 +44,17 @@ body {
 }
 
 .logo {
-  color: var(--text);
   text-decoration: none;
-  font-size: clamp(1rem, 2.3vw, 1.35rem);
-  font-weight: 800;
-  letter-spacing: 0;
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.35rem;
+  align-items: center;
   line-height: 1;
 }
 
-.logo strong {
-  color: #eaf6ff;
-  font-size: 1.35em;
-  font-style: italic;
-}
-
-.logo span {
-  color: var(--neon);
-  font-style: italic;
+.site-logo {
+  display: block;
+  width: min(240px, 58vw);
+  height: auto;
+  object-fit: contain;
 }
 
 .nav-cta {
