@@ -55,7 +55,8 @@ body {
 
 .site-logo {
   display: block;
-  width: min(180px, 52vw);
+  width: min(240px, 58vw);
+  max-height: 92px;
   height: auto;
 }
 
