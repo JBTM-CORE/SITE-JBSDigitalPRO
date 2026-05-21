@@ -4,9 +4,12 @@
   --text: #f2f7ff;
   --muted: #98a8c4;
   --neon: #39ff94;
-  --electric: #00b3ff;
+  --electric: #00a3b5;
   --purple: #7c4dff;
+  --brand-blue: #0f4c81;
+  --brand-gold: #f5a623;
   --border: #1e2d47;
+  --focus: #f5a623;
 }
 
 * { box-sizing: border-box; }
@@ -16,7 +19,7 @@ body {
   font-family: 'Inter', sans-serif;
   background:
     radial-gradient(circle at 12% -20%, rgba(124, 77, 255, 0.35), transparent 50%),
-    radial-gradient(circle at 80% 0, rgba(0, 179, 255, 0.25), transparent 48%),
+    radial-gradient(circle at 80% 0, rgba(0, 163, 181, 0.25), transparent 48%),
     var(--bg);
   color: var(--text);
   line-height: 1.6;
@@ -46,12 +49,20 @@ body {
   font-size: 1.1rem;
   font-weight: 800;
   letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.site-logo {
+  display: block;
+  width: min(180px, 52vw);
+  height: auto;
 }
 
 .logo span { color: var(--neon); }
 
 .nav-cta {
-  color: var(--bg);
+  color: #03120b;
   background: linear-gradient(90deg, var(--neon), #6dffbf);
   padding: 0.65rem 1rem;
   border-radius: 999px;
@@ -111,6 +122,18 @@ h2 { font-size: clamp(1.5rem, 4vw, 2.4rem); }
   background: rgba(16, 24, 38, 0.8);
 }
 
+.nav-cta:hover,
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.nav-cta:focus-visible,
+.btn:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
 .hero-proof {
   display: flex;
   gap: 1rem;
@@ -160,7 +183,7 @@ h2 { font-size: clamp(1.5rem, 4vw, 2.4rem); }
 .step-card p { color: var(--muted); margin: 0; }
 
 .benefits-wrap {
-  background: linear-gradient(180deg, rgba(124, 77, 255, 0.08), rgba(0, 179, 255, 0.04));
+  background: linear-gradient(180deg, rgba(124, 77, 255, 0.08), rgba(0, 163, 181, 0.04));
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
