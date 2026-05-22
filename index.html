@@ -23,7 +23,7 @@
       <a class="logo" href="#topo" aria-label="JBS DigitalPRO - página inicial">
         <img class="site-logo" src="assets/img/logo-official-transparent.png" alt="JBS DigitalPRO" width="1200" height="476" />
       </a>
-      <a class="nav-cta" href="#contato">Solicitar diagnóstico gratuito</a>
+      <a class="nav-cta js-open-lead" href="#lead-form" data-intent="Diagnostico gratuito">Solicitar diagnóstico gratuito</a>
     </nav>
 
     <div class="hero-content container">
@@ -34,9 +34,9 @@
         atendimento automatizado e acompanhamento no CRM para escalar seu negócio com previsibilidade.
       </p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="#contato">Solicitar diagnóstico gratuito</a>
-        <a class="btn btn-secondary" href="#servicos">Criar meu site</a>
-        <a class="btn btn-ghost" href="#automacoes">Automatizar meu atendimento</a>
+        <a class="btn btn-primary js-open-lead" href="#lead-form" data-intent="Diagnostico gratuito">Solicitar diagnóstico gratuito</a>
+        <a class="btn btn-secondary js-open-lead" href="#lead-form" data-intent="Criar meu site">Criar meu site</a>
+        <a class="btn btn-ghost js-open-lead" href="#lead-form" data-intent="Automatizar atendimento">Automatizar meu atendimento</a>
       </div>
       <ul class="hero-proof">
         <li>Estratégia focada em ROI</li>
@@ -137,12 +137,67 @@
         <h2>Pronto para transformar seu digital em máquina de vendas?</h2>
         <p>Escolha o próximo passo e fale com a JBS DigitalPRO agora.</p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="#">Solicitar diagnóstico gratuito</a>
-          <a class="btn btn-secondary" href="#">Criar meu site</a>
-          <a class="btn btn-ghost" href="#">Automatizar meu atendimento</a>
+          <a class="btn btn-primary js-open-lead" href="#lead-form" data-intent="Diagnostico gratuito">Solicitar diagnóstico gratuito</a>
+          <a class="btn btn-secondary js-open-lead" href="#lead-form" data-intent="Criar meu site">Criar meu site</a>
+          <a class="btn btn-ghost js-open-lead" href="#lead-form" data-intent="Automatizar atendimento">Automatizar meu atendimento</a>
         </div>
       </div>
     </section>
+
+    <section class="lead-panel" id="lead-form" aria-labelledby="lead-title">
+      <div class="container lead-layout">
+        <div>
+          <p class="eyebrow">Próximo passo</p>
+          <h2 id="lead-title">Conte o que você quer construir.</h2>
+          <p>
+            Use o formulário para iniciar um diagnóstico, pedir um site ou planejar uma automação.
+            A estrutura já está preparada para integração com n8n e Odoo CRM.
+          </p>
+        </div>
+        <form class="lead-form" data-lead-form>
+          <input type="hidden" name="origem" value="site-jbsdigitalpro" />
+          <label>
+            Interesse
+            <select name="interesse" data-lead-intent required>
+              <option value="Diagnostico gratuito">Diagnóstico gratuito</option>
+              <option value="Criar meu site">Criar meu site</option>
+              <option value="Automatizar atendimento">Automatizar meu atendimento</option>
+              <option value="Integrar Odoo e n8n">Integrar Odoo e n8n</option>
+            </select>
+          </label>
+          <div class="form-row">
+            <label>
+              Nome
+              <input name="nome" type="text" autocomplete="name" required />
+            </label>
+            <label>
+              WhatsApp
+              <input name="whatsapp" type="tel" autocomplete="tel" required />
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              E-mail
+              <input name="email" type="email" autocomplete="email" />
+            </label>
+            <label>
+              Empresa
+              <input name="empresa" type="text" autocomplete="organization" />
+            </label>
+          </div>
+          <label>
+            Mensagem
+            <textarea name="mensagem" rows="4" placeholder="Fale rapidamente sobre seu projeto, processo ou necessidade."></textarea>
+          </label>
+          <button class="btn btn-primary" type="submit">Enviar solicitação</button>
+          <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
   </main>
+  <script>
+    window.JBSDIGITALPRO_WEBHOOK_URL = '';
+  </script>
+  <script src="script.js"></script>
 </body>
 </html>

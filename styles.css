@@ -1,15 +1,17 @@
 :root {
-  --bg: #070b12;
-  --panel: #101826;
+  --bg: #030812;
+  --surface: #071426;
+  --panel: #0b1728;
   --text: #f2f7ff;
-  --muted: #98a8c4;
-  --neon: #39ff94;
-  --electric: #00a3b5;
-  --purple: #7c4dff;
-  --brand-blue: #0f4c81;
-  --brand-gold: #f5a623;
-  --border: #1e2d47;
-  --focus: #f5a623;
+  --muted: #a8b9d6;
+  --neon: #5cff94;
+  --lime: #8ee61f;
+  --electric: #09c7f7;
+  --blue: #0a57b7;
+  --deep-blue: #061f47;
+  --border: #173153;
+  --focus: #8ee61f;
+  --shadow: rgba(0, 0, 0, 0.28);
 }
 
 * { box-sizing: border-box; }
@@ -18,8 +20,9 @@ body {
   margin: 0;
   font-family: 'Inter', sans-serif;
   background:
-    radial-gradient(circle at 12% -20%, rgba(124, 77, 255, 0.35), transparent 50%),
-    radial-gradient(circle at 80% 0, rgba(0, 163, 181, 0.25), transparent 48%),
+    radial-gradient(circle at 16% -18%, rgba(10, 87, 183, 0.38), transparent 42%),
+    radial-gradient(circle at 82% -8%, rgba(9, 199, 247, 0.18), transparent 44%),
+    linear-gradient(120deg, rgba(7, 20, 38, 0.95), rgba(2, 30, 34, 0.92)),
     var(--bg);
   color: var(--text);
   line-height: 1.6;
@@ -31,7 +34,7 @@ body {
 }
 
 .hero {
-  padding: 1.2rem 0 4.5rem;
+  padding: 0.95rem 0 4.1rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -40,7 +43,7 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  padding-bottom: 2.2rem;
+  padding-bottom: 1.65rem;
 }
 
 .logo {
@@ -52,19 +55,20 @@ body {
 
 .site-logo {
   display: block;
-  width: min(240px, 58vw);
+  width: min(174px, 50vw);
   height: auto;
   object-fit: contain;
 }
 
 .nav-cta {
   color: #03120b;
-  background: linear-gradient(90deg, var(--neon), #6dffbf);
+  background: linear-gradient(90deg, var(--neon), #8dffcb);
   padding: 0.65rem 1rem;
   border-radius: 999px;
   text-decoration: none;
   font-weight: 700;
   font-size: 0.85rem;
+  box-shadow: 0 14px 36px rgba(92, 255, 148, 0.16);
 }
 
 .eyebrow {
@@ -100,11 +104,14 @@ h2 { font-size: clamp(1.5rem, 4vw, 2.4rem); }
   font-weight: 700;
   font-size: 0.93rem;
   border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .btn-primary {
   color: #03120b;
-  background: linear-gradient(90deg, var(--neon), #89ffc7);
+  background: linear-gradient(90deg, var(--neon), #9dff54);
+  box-shadow: 0 18px 44px rgba(92, 255, 148, 0.16);
 }
 
 .btn-secondary {
@@ -114,8 +121,8 @@ h2 { font-size: clamp(1.5rem, 4vw, 2.4rem); }
 
 .btn-ghost {
   color: var(--text);
-  border-color: #3f5390;
-  background: rgba(16, 24, 38, 0.8);
+  border-color: rgba(9, 199, 247, 0.42);
+  background: rgba(7, 20, 38, 0.62);
 }
 
 .nav-cta:hover,
@@ -155,12 +162,13 @@ a:focus-visible {
 .service-card,
 .benefit-card,
 .step-card {
-  background: linear-gradient(170deg, rgba(20, 32, 52, 0.95), rgba(11, 18, 30, 0.9));
+  background: linear-gradient(170deg, rgba(8, 24, 44, 0.96), rgba(4, 12, 24, 0.92));
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 8px;
   padding: 1.2rem;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 18px 52px var(--shadow);
 }
 
 .service-card::before,
@@ -171,7 +179,7 @@ a:focus-visible {
   inset: 0 auto auto 0;
   width: 42%;
   height: 3px;
-  background: linear-gradient(90deg, var(--electric), var(--purple), var(--neon));
+  background: linear-gradient(90deg, var(--blue), var(--electric), var(--lime));
 }
 
 .service-card p,
@@ -179,7 +187,7 @@ a:focus-visible {
 .step-card p { color: var(--muted); margin: 0; }
 
 .benefits-wrap {
-  background: linear-gradient(180deg, rgba(124, 77, 255, 0.08), rgba(0, 163, 181, 0.04));
+  background: linear-gradient(180deg, rgba(9, 199, 247, 0.08), rgba(142, 230, 31, 0.035));
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -198,17 +206,102 @@ a:focus-visible {
 }
 
 .final-cta-content {
-  background: linear-gradient(160deg, rgba(15, 29, 48, 0.92), rgba(19, 27, 45, 0.92));
-  border: 1px solid #2c3f65;
-  border-radius: 24px;
+  background: linear-gradient(160deg, rgba(6, 31, 71, 0.88), rgba(4, 20, 36, 0.94));
+  border: 1px solid rgba(9, 199, 247, 0.28);
+  border-radius: 8px;
   padding: 2rem;
   text-align: center;
 }
 
 .final-cta-content p { color: var(--muted); }
 
+.lead-panel {
+  padding: 4.5rem 0 5rem;
+  background:
+    radial-gradient(circle at 18% 0, rgba(9, 199, 247, 0.16), transparent 36%),
+    linear-gradient(180deg, rgba(3, 8, 18, 0.98), rgba(5, 20, 34, 0.98));
+  border-top: 1px solid var(--border);
+}
+
+.lead-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.lead-layout > div > p:not(.eyebrow) {
+  color: var(--muted);
+  max-width: 520px;
+}
+
+.lead-form {
+  display: grid;
+  gap: 1rem;
+  background: rgba(7, 20, 38, 0.86);
+  border: 1px solid rgba(9, 199, 247, 0.24);
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 24px 64px var(--shadow);
+}
+
+.lead-form label {
+  display: grid;
+  gap: 0.4rem;
+  color: #dceaff;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.lead-form input,
+.lead-form select,
+.lead-form textarea {
+  width: 100%;
+  border: 1px solid rgba(168, 185, 214, 0.24);
+  border-radius: 8px;
+  background: rgba(3, 8, 18, 0.72);
+  color: var(--text);
+  font: inherit;
+  padding: 0.8rem 0.9rem;
+}
+
+.lead-form textarea {
+  resize: vertical;
+  min-height: 112px;
+}
+
+.lead-form input:focus,
+.lead-form select:focus,
+.lead-form textarea:focus {
+  border-color: var(--electric);
+  outline: 3px solid rgba(9, 199, 247, 0.16);
+}
+
+.lead-form button {
+  justify-self: start;
+}
+
+.form-status {
+  min-height: 1.4rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.form-status.is-ready { color: var(--neon); }
+
 @media (max-width: 740px) {
   .nav { flex-direction: column; align-items: flex-start; }
   .hero { padding-top: 1rem; }
   .btn { width: 100%; text-align: center; }
+  .site-logo { width: min(156px, 54vw); }
+  .lead-layout,
+  .form-row { grid-template-columns: 1fr; }
+  .lead-form button { width: 100%; }
 }
