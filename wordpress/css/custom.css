@@ -1,0 +1,14 @@
+/* CSS adicional para o projeto Bricks */
+:root {
+  --jbs-radius: 16px;
+  --jbs-shadow: 0 10px 30px rgba(2, 6, 23, .2);
+}
+
+.cmp-section {
+  padding-block: clamp(3rem, 7vw, 6rem);
+}
+
+.cmp-card {
+  border-radius: var(--jbs-radius);
+  box-shadow: var(--jbs-shadow);
+}
